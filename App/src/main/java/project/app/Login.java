@@ -22,6 +22,12 @@ import javafx.scene.text.Font;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import javax.swing.JOptionPane;
 
 import project.Formatting.*;
 
@@ -45,13 +51,34 @@ public class Login extends Pane
 
     private void signincheck()
     {
-        boolean check; //=true/false
+        boolean check=false; //=true/false
         /*
         Insert code here to check signing in, return boolean check.
         Get text by:
         UsernameTypeField.getText();
         PasswordTypeField.getText();
          */
+        String url = "jdbc:mysql://localhost:3306/exercise";
+        String user = "root";
+        String password = "";
+        String SqlLogin= "Select `Password` from `gui` where `UserName` = ? ";
+        try(Connection conn = DriverManager.getConnection(url, user, password)) {
+            System.out.println("ket noi thanh cong");
+            System.out.println(conn.getCatalog());
+            PreparedStatement ps = conn.prepareStatement(SqlLogin);
+            ps.setString(0, UsernameTypeField.getText());
+            ResultSet rs= ps.executeQuery();
+           if (rs.next()){
+                if (rs.getString("Password").equals(PasswordTypeField.getText())){
+                    check=true;
+                }
+           }
+           else{
+                JOptionPane.showMessageDialog(null, "Fail to Login", "Error", JOptionPane.ERROR_MESSAGE);
+           }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
 
         LoginNotification.setVisible(true);
         if(check==false)
